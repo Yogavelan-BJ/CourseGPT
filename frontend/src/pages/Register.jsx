@@ -23,7 +23,7 @@ export default function Register() {
       setError("");
       setLoading(true);
       const user = await signup(email, password);
-      await axios.post("http://localhost:5000/api/create-user", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/create-user`, {
         user: user.user,
       });
       navigate("/generate-lesson");

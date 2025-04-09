@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCQVGyvVYeJPRVRmYSrCpx98WkOKw-wqDQ",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "coursegpt-2bbab.firebaseapp.com",
   projectId: "coursegpt-2bbab",
   storageBucket: "coursegpt-2bbab.firebasestorage.app",

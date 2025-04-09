@@ -16,7 +16,7 @@ function ModuleManagement() {
     try {
       setFetchError("");
       const response = await axios.get(
-        `http://localhost:5000/api/modules/user/${currentUser.uid}`
+        `${import.meta.env.VITE_API_URL}/modules/user/${currentUser.uid}`
       );
       setModules(response.data.modules || []);
     } catch (err) {
@@ -36,7 +36,7 @@ function ModuleManagement() {
     setSuccess("");
 
     try {
-      await axios.post("http://localhost:5000/api/modules", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/modules`, {
         name: moduleName,
         userId: currentUser.uid,
       });

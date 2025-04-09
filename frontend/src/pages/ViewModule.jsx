@@ -28,15 +28,14 @@ function ViewModule() {
 
         // Fetch module details
         const moduleResponse = await axios.get(
-          `http://localhost:5000/api/modules/${moduleId}`
+          `${import.meta.env.VITE_API_URL}/modules/${moduleId}`
         );
         setModule(moduleResponse.data);
 
         // Fetch lessons for the module
         const lessonsResponse = await axios.get(
-          `http://localhost:5000/api/modules/${moduleId}/lessons`
+          `${import.meta.env.VITE_API_URL}/modules/${moduleId}/lessons`
         );
-        console.log(lessonsResponse.data);
         setLessons(lessonsResponse.data);
       } catch (err) {
         setError(
@@ -64,7 +63,7 @@ function ViewModule() {
       setSaveStatus({ type: "loading", message: "Saving changes..." });
 
       const response = await axios.put(
-        `http://localhost:5000/api/lessons/${editingLesson._id}`,
+        `${import.meta.env.VITE_API_URL}/lessons/${editingLesson._id}`,
         editingLesson
       );
 

@@ -20,7 +20,7 @@ function GenerateLesson() {
     const fetchModules = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/modules/user/${currentUser.uid}`
+          `${import.meta.env.VITE_API_URL}/modules/user/${currentUser.uid}`
         );
         setModules(response.data.modules || []);
       } catch (err) {
@@ -56,7 +56,7 @@ function GenerateLesson() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/gpt/generate-lesson",
+        `${import.meta.env.VITE_API_URL}/gpt/generate-lesson`,
         {
           topic: topic.trim(),
         }
@@ -89,10 +89,13 @@ function GenerateLesson() {
 
     try {
       setSaveStatus({ type: "loading", message: "Saving lesson..." });
-      const response = await axios.post("http://localhost:5000/api/lessons/", {
-        lesson: lesson,
-        moduleId: selectedModule,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/lessons/`,
+        {
+          lesson: lesson,
+          moduleId: selectedModule,
+        }
+      );
 
       setSaveStatus({
         type: "success",
