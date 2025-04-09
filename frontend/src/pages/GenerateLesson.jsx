@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
 
 function GenerateLesson() {
   const [topic, setTopic] = useState("");
@@ -9,7 +10,20 @@ function GenerateLesson() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-
+  const [selectedModule, setSelectedModule] = useState(1);
+  const { currentUser } = useAuth();
+  const saveLesson = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/lessons/", {
+        lesson: lesson,
+        user: currentUser,
+        moduleId: selectedModule,
+      });
+      console.log(response);
+    } catch (err) {
+      console.log("Error while Saving Lesson to DB", err.message);
+    }
+  };
   const generateLesson = async () => {
     if (!topic.trim()) {
       setError("Please enter a topic");
@@ -21,7 +35,7 @@ function GenerateLesson() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/generate-lesson",
+        "http://localhost:5000/api/gpt/generate-lesson",
         {
           topic: topic.trim(),
         }
@@ -145,6 +159,47 @@ function GenerateLesson() {
 
       {editedLesson && (
         <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
+          {!isEditing ? (
+            <div className="space-x-2 m-2 flex justify-center items-center">
+              <select
+                id="moduleSelect"
+                value={selectedModule}
+                onChange={(e) => setSelectedModule(e.target.value)}
+                className="border rounded p-2 w-full"
+              >
+                <option value="">-- Choose a module --</option>
+                <option value="92813469">History</option>
+              </select>
+              <button
+                onClick={saveLesson}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Save Lesson
+              </button>
+              <button
+                onClick={handleEdit}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Edit Lesson
+              </button>
+            </div>
+          ) : (
+            <div className="space-x-2 m-2 flex justify-center items-center">
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 disabled:opacity-50"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={handleCancel}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">
               {isEditing ? (
@@ -158,30 +213,6 @@ function GenerateLesson() {
                 editedLesson.title
               )}
             </h2>
-            {!isEditing ? (
-              <button
-                onClick={handleEdit}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              >
-                Edit Lesson
-              </button>
-            ) : (
-              <div className="space-x-2">
-                <button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 disabled:opacity-50"
-                >
-                  Save Changes
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="mb-6">

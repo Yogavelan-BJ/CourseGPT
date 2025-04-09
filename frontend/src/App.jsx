@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import GenerateLesson from "./pages/GenerateLesson";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ModuleManagement from "./pages/ModuleManagement";
 import PrivateRoute from "./components/PrivateRoute";
 import { Navigate } from "react-router-dom";
 
@@ -17,6 +18,14 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route
             path="/generate-lesson"
+            element={
+              <PrivateRoute>
+                <GenerateLesson />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/manage-modules"
             element={
               <PrivateRoute>
                 <GenerateLesson />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import axios from "axios";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -10,7 +11,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
-
+  const { currentUser } = useAuth();
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -22,6 +23,9 @@ export default function Register() {
       setError("");
       setLoading(true);
       await signup(email, password);
+      await axios.post("http://localhost:5000/api/create-user", {
+        user: currentUser,
+      });
       navigate("/generate-lesson");
     } catch (err) {
       setError("Failed to create an account. Please try again.");

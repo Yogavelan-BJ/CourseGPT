@@ -27,6 +27,12 @@ export default function Header() {
             {currentUser ? (
               <>
                 <Link
+                  to="/manage-modules"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Manage
+                </Link>
+                <Link
                   to="/generate-lesson"
                   className="text-gray-600 hover:text-gray-900"
                 >
