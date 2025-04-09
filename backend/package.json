@@ -2,9 +2,9 @@
   "name": "coursegpt-backend",
   "version": "1.0.0",
   "description": "Backend for CourseGPT - AI-powered course content generator",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "axios": "^1.6.2",

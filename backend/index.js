@@ -18,7 +18,9 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(express.json());
-
+app.get("/", (req, res) => {
+  res.send("Welcome to CourseGPT API");
+});
 app.use("/api/modules", moduleRoutes);
 app.use("/api/lessons", lessonRoutes);
 app.use("/api/gpt", gptRoutes);
