@@ -22,9 +22,9 @@ export default function Register() {
     try {
       setError("");
       setLoading(true);
-      await signup(email, password);
+      const user = await signup(email, password);
       await axios.post("http://localhost:5000/api/create-user", {
-        user: currentUser,
+        user: user.user,
       });
       navigate("/generate-lesson");
     } catch (err) {

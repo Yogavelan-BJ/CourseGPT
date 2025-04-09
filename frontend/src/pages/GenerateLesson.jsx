@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -10,20 +10,29 @@ function GenerateLesson() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedModule, setSelectedModule] = useState(1);
+  const [selectedModule, setSelectedModule] = useState("");
+  const [modules, setModules] = useState([]);
+  const [processPercentage, setProcessPercentage] = useState(0);
+  const [saveStatus, setSaveStatus] = useState({ type: "", message: "" });
   const { currentUser } = useAuth();
-  const saveLesson = async () => {
-    try {
-      const response = await axios.post("http://localhost:5000/api/lessons/", {
-        lesson: lesson,
-        user: currentUser,
-        moduleId: selectedModule,
-      });
-      console.log(response);
-    } catch (err) {
-      console.log("Error while Saving Lesson to DB", err.message);
+
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/modules/user/${currentUser.uid}`
+        );
+        setModules(response.data.modules || []);
+      } catch (err) {
+        console.error("Error fetching modules:", err);
+      }
+    };
+
+    if (currentUser) {
+      fetchModules();
     }
-  };
+  }, [currentUser]);
+
   const generateLesson = async () => {
     if (!topic.trim()) {
       setError("Please enter a topic");
@@ -32,6 +41,18 @@ function GenerateLesson() {
 
     setLoading(true);
     setError("");
+    setProcessPercentage(0);
+
+    // Simulate progress updates
+    const progressInterval = setInterval(() => {
+      setProcessPercentage((prev) => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 1000);
 
     try {
       const response = await axios.post(
@@ -43,6 +64,7 @@ function GenerateLesson() {
 
       setLesson(response.data);
       setEditedLesson(response.data);
+      setProcessPercentage(100);
     } catch (err) {
       setError(
         err.response?.data?.error ||
@@ -50,7 +72,46 @@ function GenerateLesson() {
       );
       console.error("Error:", err);
     } finally {
+      clearInterval(progressInterval);
       setLoading(false);
+      setTimeout(() => setProcessPercentage(0), 1000);
+    }
+  };
+
+  const saveLesson = async () => {
+    if (!selectedModule) {
+      setSaveStatus({
+        type: "error",
+        message: "Please select a module to save the lesson",
+      });
+      return;
+    }
+
+    try {
+      setSaveStatus({ type: "loading", message: "Saving lesson..." });
+      const response = await axios.post("http://localhost:5000/api/lessons/", {
+        lesson: lesson,
+        moduleId: selectedModule,
+      });
+
+      setSaveStatus({
+        type: "success",
+        message: "Lesson saved successfully!",
+      });
+      setLesson(null);
+      setEditedLesson(null);
+      setTopic("");
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSaveStatus({ type: "", message: "" });
+      }, 3000);
+    } catch (err) {
+      setSaveStatus({
+        type: "error",
+        message: "Failed to save lesson. Please try again.",
+      });
+      console.log("Error while Saving Lesson to DB", err.message);
     }
   };
 
@@ -151,9 +212,58 @@ function GenerateLesson() {
         </button>
       </div>
 
+      {loading && (
+        <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
+          <div className="flex items-center space-x-4">
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-4 border-blue-200"></div>
+              <div
+                className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"
+                style={{ transform: `rotate(${processPercentage * 3.6}deg)` }}
+              ></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-sm font-bold">{processPercentage}%</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 transition-all duration-300"
+                  style={{ width: `${processPercentage}%` }}
+                ></div>
+              </div>
+              <p className="mt-2 text-sm text-gray-600">
+                {processPercentage < 30 && "Analyzing topic..."}
+                {processPercentage >= 30 &&
+                  processPercentage < 60 &&
+                  "Generating content..."}
+                {processPercentage >= 60 &&
+                  processPercentage < 90 &&
+                  "Structuring lesson..."}
+                {processPercentage >= 90 && "Finalizing..."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md">
           {error}
+        </div>
+      )}
+
+      {saveStatus.message && (
+        <div
+          className={`mt-4 p-4 rounded-md ${
+            saveStatus.type === "error"
+              ? "bg-red-100 text-red-700"
+              : saveStatus.type === "success"
+              ? "bg-green-100 text-green-700"
+              : "bg-blue-100 text-blue-700"
+          }`}
+        >
+          {saveStatus.message}
         </div>
       )}
 
@@ -168,13 +278,22 @@ function GenerateLesson() {
                 className="border rounded p-2 w-full"
               >
                 <option value="">-- Choose a module --</option>
-                <option value="92813469">History</option>
+                {modules.map((module) => (
+                  <option key={module._id} value={module._id}>
+                    {module.name}
+                  </option>
+                ))}
               </select>
               <button
                 onClick={saveLesson}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                disabled={saveStatus.type === "loading"}
+                className={`px-4 py-2 rounded-md ${
+                  saveStatus.type === "loading"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                } text-white`}
               >
-                Save Lesson
+                {saveStatus.type === "loading" ? "Saving..." : "Save Lesson"}
               </button>
               <button
                 onClick={handleEdit}

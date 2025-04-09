@@ -2,23 +2,27 @@ const Module = require("../models/Module");
 const User = require("../models/User");
 const Lesson = require("../models/Lesson");
 
-// Create a new module
 const createModule = async (req, res) => {
   try {
     const { name, userId } = req.body;
 
-    // Create the module
     const module = new Module({
       name,
-      userId,
     });
 
     const savedModule = await module.save();
 
-    // Add module reference to user
-    await User.findByIdAndUpdate(userId, {
-      $push: { modules: savedModule._id },
-    });
+    const updatedUser = await User.findOneAndUpdate(
+      { firebaseId: userId },
+      { $addToSet: { modules: savedModule._id } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      console.log("User not found");
+    } else {
+      console.log("Updated user:", updatedUser);
+    }
 
     res.status(201).json(savedModule);
   } catch (error) {
@@ -26,49 +30,43 @@ const createModule = async (req, res) => {
   }
 };
 
-// Get all modules for a user
 const getUserModules = async (req, res) => {
   try {
     const { userId } = req.params;
-    const modules = await Module.find({ userId }).populate("lessons");
+    const modules = await User.findOne({ firebaseId: userId }).populate(
+      "modules"
+    );
+    console.log(modules);
     res.json(modules);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Add a lesson to a module
-const addLessonToModule = async (req, res) => {
+const getModuleLessons = async (req, res) => {
   try {
     const { moduleId } = req.params;
-    const { name, content } = req.body;
-
-    // Create the lesson
-    const lesson = new Lesson({
-      name,
-      content,
-      moduleId,
-    });
-
-    const savedLesson = await lesson.save();
-
-    // Add lesson reference to module
-    await Module.findByIdAndUpdate(moduleId, {
-      $push: { lessons: savedLesson._id },
-    });
-
-    res.status(201).json(savedLesson);
+    const module = await Module.findById(moduleId).populate();
+    let lessons = [];
+    for (let i of module.lessons) {
+      const lesson = await Lesson.findById(i);
+      lessons.push(lesson);
+    }
+    res.json(lessons);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get all lessons in a module
-const getModuleLessons = async (req, res) => {
+// Get a single module by ID
+const getModuleById = async (req, res) => {
   try {
     const { moduleId } = req.params;
-    const lessons = await Lesson.find({ moduleId });
-    res.json(lessons);
+    const module = await Module.findById(moduleId).populate();
+    if (!module) {
+      return res.status(404).json({ message: "Module not found" });
+    }
+    res.json(module);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -77,6 +75,6 @@ const getModuleLessons = async (req, res) => {
 module.exports = {
   createModule,
   getUserModules,
-  addLessonToModule,
   getModuleLessons,
+  getModuleById,
 };
