@@ -4,15 +4,9 @@ const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
 // Create axios instance with default config
 const api = axios.create({
-  timeout: 25000, // 25 seconds
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${MISTRAL_API_KEY}`,
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers":
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    "Access-Control-Allow-Credentials": "true",
   },
 });
 
@@ -100,12 +94,7 @@ async function generateLesson(req, res) {
       data: error.response?.data,
     });
 
-    if (error.code === "ECONNABORTED") {
-      return res.status(504).json({
-        error: "Request timeout",
-        details: "The request took too long to complete",
-      });
-    } else if (error.response?.status === 401) {
+    if (error.response?.status === 401) {
       return res.status(401).json({
         error: "Authentication failed",
         details: "Invalid API key or unauthorized access",
