@@ -35,31 +35,44 @@ async function generateLesson(req, res) {
     
     Return ONLY the JSON object, without any markdown formatting or additional text.`;
 
-    const response = await axios.post(
-      MISTRAL_API_URL,
-      {
-        model: "mistral-small-latest",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${MISTRAL_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        timeout: 20000,
-      }
-    );
+    // const response = await axios.post(
+    //   MISTRAL_API_URL,
+    //   {
+    //     model: "mistral-small-latest",
+    //     messages: [
+    //       {
+    //         role: "user",
+    //         content: prompt,
+    //       },
+    //     ],
+    //     temperature: 0.7,
+    //     max_tokens: 2000,
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${MISTRAL_API_KEY}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //     timeout: 20000,
+    //   }
+    // );
 
-    let content = response.data.choices[0].message.content;
-    content = content.replace(/```json\n?|\n?```/g, "");
-    content = content.trim();
+    // let content = response.data.choices[0].message.content;
+    // content = content.replace(/```json\n?|\n?```/g, "");
+    // content = content.trim();
+    content = {
+      title: "string",
+      description: "string",
+      learningOutcomes: ["string", "string", "string"],
+      keyTerms: [
+        {
+          term: "string",
+          definition: "string",
+        },
+      ],
+      examples: ["string", "string"],
+      content: [{ subTopic: "string", content: "string" }],
+    };
 
     try {
       const lessonContent = JSON.parse(content);
