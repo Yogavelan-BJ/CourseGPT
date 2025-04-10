@@ -12,7 +12,7 @@ const app = express();
 
 connectDB();
 const corsOptions = {
-  origin: "https://course-gpt-qpa9.vercel.app",
+  origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
