@@ -1,12 +1,12 @@
 const axios = require("axios");
-const MISTRAL_API_KEY = "7aLCI45IxcwnQUx47C3URVhVjNMz4MZ2";
+const dotenv = require("dotenv");
+dotenv.config();
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-// Create axios instance with default config
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${MISTRAL_API_KEY}`,
+    Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`,
   },
 });
 
@@ -38,8 +38,8 @@ async function generateLesson(req, res) {
     - Description should be 1 sentences
     - Include 1 learning outcomes as bullet points
     - Include 1 key terms with their definitions
-    - Provide 1 practical examples if applicable, if not give 2-3 facts about the topic.
-    - Include Necessary subtopics (1) with their content (150-300 words) to teach all the learning objectives.
+    - Provide 1 practical examples if applicable, if not give 1 facts about the topic.
+    - Include Necessary subtopics (1) with their content (100 words) to teach all the learning objectives.
     
     Return ONLY the JSON object, without any markdown formatting or additional text.`;
 
