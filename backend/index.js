@@ -9,14 +9,10 @@ const { createUser } = require("./controllers/userController");
 dotenv.config();
 
 const app = express();
-
 connectDB();
-const corsOptions = {
-  origin: "*",
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+
+app.use(cors());
+
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Welcome to CourseGPT API");
