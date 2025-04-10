@@ -235,6 +235,14 @@ function GenerateLesson() {
           <p className="mt-3 text-xl text-purple-200">
             Enter a topic and let AI create a comprehensive lesson for you
           </p>
+          <div className="mt-4 p-4 bg-purple-900/30 rounded-xl border border-purple-400/30 max-w-2xl mx-auto">
+            <p className="text-sm text-purple-200">
+              <span className="font-semibold text-white">Note:</span> Due to API
+              constraints, lesson generation may take 30-60 seconds. Generated
+              content is intentionally concise to ensure quality and manage
+              resource limitations.
+            </p>
+          </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 p-6 mb-8">

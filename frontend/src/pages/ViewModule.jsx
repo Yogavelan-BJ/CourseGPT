@@ -279,6 +279,15 @@ function ViewModule() {
             <p className="mt-2 text-lg text-purple-200">
               {lessons.length} {lessons.length === 1 ? "Lesson" : "Lessons"}
             </p>
+            <div className="mt-4 p-4 bg-purple-900/30 rounded-xl border border-purple-400/30 max-w-2xl">
+              <p className="text-sm text-purple-200">
+                <span className="font-semibold text-white">Note:</span> Lesson
+                content is intentionally concise due to API constraints. For a
+                complete learning experience, we recommend supplementing with
+                additional resources and expanding on the provided examples and
+                facts.
+              </p>
+            </div>
           </div>
           <button
             onClick={() => navigate("/manage-modules")}
