@@ -184,12 +184,14 @@ export default function Header() {
                     </div>
                     <Link
                       to="/manage-modules"
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="block text-white hover:text-teal-400 px-4 py-3 rounded-xl text-base font-medium transition duration-200 hover:bg-white/10"
                     >
                       Manage Modules
                     </Link>
                     <Link
                       to="/generate-lesson"
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="block text-white hover:text-teal-400 px-4 py-3 rounded-xl text-base font-medium transition duration-200 hover:bg-white/10"
                     >
                       Generate Lesson
