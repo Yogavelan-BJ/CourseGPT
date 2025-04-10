@@ -19,6 +19,10 @@ function ViewModule() {
     content: true,
     examples: true,
   });
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLessonId, setDeleteLessonId] = useState(null);
+  const [deleteLessonLoading, setDeleteLessonLoading] = useState(false);
 
   useEffect(() => {
     const fetchModuleAndLessons = async () => {
@@ -224,6 +228,74 @@ function ViewModule() {
     );
   };
 
+  const handleDeleteModule = async () => {
+    if (!deleteConfirm) {
+      setDeleteConfirm(true);
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/modules/${moduleId}`
+      );
+
+      // Show success message
+      setSaveStatus({
+        type: "success",
+        message: response.data.message || "Module deleted successfully",
+      });
+
+      // Navigate back to modules page after a short delay
+      setTimeout(() => {
+        navigate("/manage-modules");
+      }, 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete module");
+      setDeleteConfirm(false);
+      setDeleteLoading(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm(false);
+  };
+
+  const handleDeleteLesson = async (lessonId) => {
+    if (deleteLessonId !== lessonId) {
+      setDeleteLessonId(lessonId);
+      return;
+    }
+
+    try {
+      setDeleteLessonLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/lessons/${lessonId}`
+      );
+
+      // Show success message
+      setSaveStatus({
+        type: "success",
+        message: response.data.message || "Lesson deleted successfully",
+      });
+
+      // Update the lessons list
+      setLessons(lessons.filter((lesson) => lesson._id !== lessonId));
+
+      // Reset delete state
+      setDeleteLessonId(null);
+      setDeleteLessonLoading(false);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete lesson");
+      setDeleteLessonId(null);
+      setDeleteLessonLoading(false);
+    }
+  };
+
+  const cancelDeleteLesson = () => {
+    setDeleteLessonId(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center">
@@ -271,28 +343,84 @@ function ViewModule() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-800 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
-              {module?.name}
-            </h1>
-            <p className="mt-2 text-lg text-purple-200">
-              {lessons.length} {lessons.length === 1 ? "Lesson" : "Lessons"}
-            </p>
-            <div className="mt-4 p-4 bg-purple-900/30 rounded-xl border border-purple-400/30 max-w-2xl">
-              <p className="text-sm text-purple-200">
-                <span className="font-semibold text-white">Note:</span> Lesson
-                content is intentionally concise due to API constraints and
-                potential API Gateway time limits.
+        <div className="mb-8">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
+                {module?.name}
+              </h1>
+              <p className="mt-2 text-lg text-purple-200">
+                {lessons.length} {lessons.length === 1 ? "Lesson" : "Lessons"}
               </p>
             </div>
+            <div className="flex gap-4">
+              <button
+                onClick={() => navigate("/manage-modules")}
+                className="px-6 py-3 bg-gradient-to-r from-purple-400 to-indigo-500 text-white font-medium rounded-xl hover:from-purple-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
+              >
+                Back to Modules
+              </button>
+              {deleteConfirm ? (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleDeleteModule}
+                    disabled={deleteLoading}
+                    className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
+                  >
+                    {deleteLoading ? (
+                      <span className="flex items-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Deleting...
+                      </span>
+                    ) : (
+                      "Confirm Delete"
+                    )}
+                  </button>
+                  <button
+                    onClick={cancelDelete}
+                    className="px-6 py-3 bg-gradient-to-r from-purple-400/20 to-purple-500/20 text-white font-medium rounded-xl hover:from-purple-500/30 hover:to-purple-600/30 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleDeleteModule}
+                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Delete Module
+                </button>
+              )}
+            </div>
           </div>
-          <button
-            onClick={() => navigate("/manage-modules")}
-            className="px-6 py-3 bg-gradient-to-r from-purple-400 to-indigo-500 text-white font-medium rounded-xl hover:from-purple-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
-          >
-            Back to Modules
-          </button>
+          <div className="p-4 bg-purple-900/30 rounded-xl border border-purple-400/30">
+            <p className="text-sm text-purple-200">
+              <span className="font-semibold text-white">Note:</span> Lesson
+              content is intentionally concise due to API constraints and
+              potential API Gateway time limits. For a complete learning
+              experience, we recommend supplementing with additional resources
+              and expanding on the provided examples and facts.
+            </p>
+          </div>
         </div>
 
         {saveStatus.message && (
@@ -358,15 +486,76 @@ function ViewModule() {
                 </h2>
                 <div className="flex items-center space-x-4">
                   {editingLesson?._id !== lesson._id && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditLesson(lesson);
-                      }}
-                      className="px-4 py-2 bg-gradient-to-r from-teal-400 to-purple-500 text-white font-medium rounded-xl hover:from-teal-500 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
-                    >
-                      Edit Lesson
-                    </button>
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditLesson(lesson);
+                        }}
+                        className="px-4 py-2 bg-gradient-to-r from-teal-400 to-purple-500 text-white font-medium rounded-xl hover:from-teal-500 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
+                      >
+                        Edit Lesson
+                      </button>
+                      {deleteLessonId === lesson._id ? (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteLesson(lesson._id);
+                            }}
+                            disabled={deleteLessonLoading}
+                            className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
+                          >
+                            {deleteLessonLoading ? (
+                              <span className="flex items-center">
+                                <svg
+                                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                                Deleting...
+                              </span>
+                            ) : (
+                              "Confirm Delete"
+                            )}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              cancelDeleteLesson();
+                            }}
+                            className="px-4 py-2 bg-gradient-to-r from-purple-400/20 to-purple-500/20 text-white font-medium rounded-xl hover:from-purple-500/30 hover:to-purple-600/30 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteLesson(lesson._id);
+                          }}
+                          className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 shadow-lg hover:shadow-xl"
+                        >
+                          Delete Lesson
+                        </button>
+                      )}
+                    </div>
                   )}
                   <button className="text-purple-400 hover:text-teal-400 transition duration-200">
                     {expandedLessons[lesson._id] ? (

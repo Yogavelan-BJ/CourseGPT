@@ -52,6 +52,17 @@ export default function Login() {
             Sign in to your account to continue
           </p>
         </div>
+        <div className="p-4 bg-purple-900/30 rounded-xl border border-purple-400/30">
+          <p className="text-sm text-purple-200">
+            <span className="font-semibold text-white">Quick Access:</span> For
+            evaluators, use the following credentials:
+            <br />
+            <span className="text-teal-300">Email:</span>{" "}
+            kalviumuser2025@gmail.com
+            <br />
+            <span className="text-teal-300">Password:</span> Kalvium@user
+          </p>
+        </div>
         {error && (
           <div className="bg-red-500/20 border-l-4 border-red-500 p-4 rounded-xl">
             <div className="flex">

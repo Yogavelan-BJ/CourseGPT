@@ -36,7 +36,34 @@ const updateLesson = async (req, res) => {
   }
 };
 
+const deleteLesson = async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+
+    // Find the lesson
+    const lesson = await Lesson.findById(lessonId);
+    if (!lesson) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+
+    // Remove the lesson reference from its module
+    await Module.updateMany(
+      { lessons: lessonId },
+      { $pull: { lessons: lessonId } }
+    );
+
+    // Delete the lesson
+    await Lesson.findByIdAndDelete(lessonId);
+
+    res.json({ message: "Lesson deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error deleting lesson" });
+  }
+};
+
 module.exports = {
   createLesson,
   updateLesson,
+  deleteLesson,
 };

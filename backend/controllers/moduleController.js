@@ -72,9 +72,38 @@ const getModuleById = async (req, res) => {
   }
 };
 
+const deleteModule = async (req, res) => {
+  try {
+    const { moduleId } = req.params;
+
+    // Find the module
+    const module = await Module.findById(moduleId);
+    if (!module) {
+      return res.status(404).json({ message: "Module not found" });
+    }
+
+    // Delete all lessons associated with the module
+    await Lesson.deleteMany({ _id: { $in: module.lessons } });
+
+    // Delete the module
+    await Module.findByIdAndDelete(moduleId);
+
+    // Remove the module reference from all users
+    await User.updateMany(
+      { modules: moduleId },
+      { $pull: { modules: moduleId } }
+    );
+
+    res.json({ message: "Module and associated lessons deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createModule,
   getUserModules,
   getModuleLessons,
   getModuleById,
+  deleteModule,
 };
