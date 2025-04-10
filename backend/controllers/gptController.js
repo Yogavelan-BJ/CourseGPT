@@ -46,22 +46,21 @@ async function generateLesson(req, res) {
           },
         ],
         temperature: 0.7,
-        max_tokens: 5000,
+        max_tokens: 2000,
       },
       {
         headers: {
           Authorization: `Bearer ${MISTRAL_API_KEY}`,
           "Content-Type": "application/json",
         },
-        timeout: 30000,
+        timeout: 20000,
       }
     );
 
     let content = response.data.choices[0].message.content;
-
     content = content.replace(/```json\n?|\n?```/g, "");
-
     content = content.trim();
+
     try {
       const lessonContent = JSON.parse(content);
 
