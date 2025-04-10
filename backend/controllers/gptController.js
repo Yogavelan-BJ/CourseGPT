@@ -75,7 +75,8 @@ async function generateLesson(req, res) {
     };
 
     try {
-      const lessonContent = JSON.parse(content);
+      const lessonContent = content;
+      // const lessonContent = JSON.parse(content);
 
       if (!Array.isArray(lessonContent.keyTerms)) {
         if (typeof lessonContent.keyTerms === "object") {
