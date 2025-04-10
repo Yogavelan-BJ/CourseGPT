@@ -11,7 +11,6 @@ dotenv.config();
 const app = express();
 connectDB();
 
-// Configure CORS
 app.use(
   cors({
     origin: [
@@ -24,9 +23,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
-
-// Handle preflight requests
-app.options("*", cors());
 
 app.use(express.json());
 app.get("/", (req, res) => {
