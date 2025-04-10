@@ -2,6 +2,20 @@ const axios = require("axios");
 const MISTRAL_API_KEY = "7aLCI45IxcwnQUx47C3URVhVjNMz4MZ2";
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
+// Create axios instance with default config
+const api = axios.create({
+  timeout: 25000, // 25 seconds
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${MISTRAL_API_KEY}`,
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+  },
+});
+
 async function generateLesson(req, res) {
   try {
     const { topic } = req.body;
@@ -35,48 +49,26 @@ async function generateLesson(req, res) {
     
     Return ONLY the JSON object, without any markdown formatting or additional text.`;
 
-    // const response = await axios.post(
-    //   MISTRAL_API_URL,
-    //   {
-    //     model: "mistral-small-latest",
-    //     messages: [
-    //       {
-    //         role: "user",
-    //         content: prompt,
-    //       },
-    //     ],
-    //     temperature: 0.7,
-    //     max_tokens: 2000,
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${MISTRAL_API_KEY}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //     timeout: 20000,
-    //   }
-    // );
-
-    // let content = response.data.choices[0].message.content;
-    // content = content.replace(/```json\n?|\n?```/g, "");
-    // content = content.trim();
-    content = {
-      title: "string",
-      description: "string",
-      learningOutcomes: ["string", "string", "string"],
-      keyTerms: [
+    console.log("Making request to Mistral API...");
+    const response = await api.post(MISTRAL_API_URL, {
+      model: "mistral-small-latest",
+      messages: [
         {
-          term: "string",
-          definition: "string",
+          role: "user",
+          content: prompt,
         },
       ],
-      examples: ["string", "string"],
-      content: [{ subTopic: "string", content: "string" }],
-    };
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
+
+    console.log("Mistral API response received:", response.status);
+    let content = response.data.choices[0].message.content;
+    content = content.replace(/```json\n?|\n?```/g, "");
+    content = content.trim();
 
     try {
-      const lessonContent = content;
-      // const lessonContent = JSON.parse(content);
+      const lessonContent = JSON.parse(content);
 
       if (!Array.isArray(lessonContent.keyTerms)) {
         if (typeof lessonContent.keyTerms === "object") {
@@ -91,25 +83,44 @@ async function generateLesson(req, res) {
         }
       }
 
-      res.json(lessonContent);
+      return res.json(lessonContent);
     } catch (parseError) {
       console.error("Error parsing response:", parseError);
-      res.status(500).json({
+      return res.status(500).json({
         error: "Failed to parse lesson content",
         details: parseError.message,
       });
     }
   } catch (error) {
-    console.error("Error generating lesson:", error.message);
+    console.error("Error generating lesson:", {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+    });
+
     if (error.code === "ECONNABORTED") {
-      res.status(504).json({
+      return res.status(504).json({
         error: "Request timeout",
         details: "The request took too long to complete",
       });
+    } else if (error.response?.status === 401) {
+      return res.status(401).json({
+        error: "Authentication failed",
+        details: "Invalid API key or unauthorized access",
+      });
+    } else if (error.response?.status === 429) {
+      return res.status(429).json({
+        error: "Rate limit exceeded",
+        details: "Too many requests to Mistral API",
+      });
     } else {
-      res.status(500).json({
+      return res.status(500).json({
         error: "Failed to generate lesson content",
         details: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
       });
     }
   }
