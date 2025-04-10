@@ -6,6 +6,10 @@ async function generateLesson(req, res) {
   try {
     const { topic } = req.body;
 
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required" });
+    }
+
     const prompt = `Generate a structured lesson about ${topic}. Return a JSON object with the following structure:
     {
       "title": "string",
@@ -42,13 +46,14 @@ async function generateLesson(req, res) {
           },
         ],
         temperature: 0.7,
-        max_tokens: 10000,
+        max_tokens: 5000,
       },
       {
         headers: {
           Authorization: `Bearer ${MISTRAL_API_KEY}`,
           "Content-Type": "application/json",
         },
+        timeout: 30000,
       }
     );
 
@@ -83,10 +88,17 @@ async function generateLesson(req, res) {
     }
   } catch (error) {
     console.error("Error generating lesson:", error.message);
-    res.status(500).json({
-      error: "Failed to generate lesson content",
-      details: error.message,
-    });
+    if (error.code === "ECONNABORTED") {
+      res.status(504).json({
+        error: "Request timeout",
+        details: "The request took too long to complete",
+      });
+    } else {
+      res.status(500).json({
+        error: "Failed to generate lesson content",
+        details: error.message,
+      });
+    }
   }
 }
 
