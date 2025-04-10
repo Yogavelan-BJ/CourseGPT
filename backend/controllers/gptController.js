@@ -36,10 +36,10 @@ async function generateLesson(req, res) {
     Requirements:
     - Title should be concise and descriptive
     - Description should be 1 sentences
-    - Include 1 learning outcomes as bullet points
-    - Include 1 key terms with their definitions
-    - Provide 1 practical examples if applicable, if not give 1 facts about the topic.
-    - Include Necessary subtopics (1) with their content (100 words) to teach all the learning objectives.
+    - Include 3-4 learning outcomes as bullet points
+    - Include 5-6 key terms with their definitions
+    - Provide 2-3 practical examples if applicable, if not give 2-3 facts about the topic.
+    - Include Necessary subtopics (2-3) with their content (100-150 words) to teach all the learning objectives.
     
     Return ONLY the JSON object, without any markdown formatting or additional text.`;
 
@@ -53,7 +53,7 @@ async function generateLesson(req, res) {
         },
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: 5000,
     });
 
     console.log("Mistral API response received:", response.status);

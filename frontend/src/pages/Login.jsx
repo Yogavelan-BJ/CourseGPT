@@ -27,11 +27,11 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-800 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white/10 backdrop-blur-lg p-10 rounded-3xl shadow-2xl border border-white/20">
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-full">
+            <div className="bg-gradient-to-r from-teal-400 to-purple-500 p-4 rounded-2xl shadow-lg">
               <svg
                 className="h-12 w-12 text-white"
                 fill="none"
@@ -47,19 +47,17 @@ export default function Login() {
               </svg>
             </div>
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Welcome back
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="text-3xl font-extrabold text-white">Welcome back</h2>
+          <p className="mt-2 text-sm text-purple-100">
             Sign in to your account to continue
           </p>
         </div>
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+          <div className="bg-red-500/20 border-l-4 border-red-500 p-4 rounded-xl">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg
-                  className="h-5 w-5 text-red-500"
+                  className="h-5 w-5 text-red-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -73,7 +71,7 @@ export default function Login() {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-100">{error}</p>
               </div>
             </div>
           </div>
@@ -83,14 +81,14 @@ export default function Login() {
             <div>
               <label
                 htmlFor="email-address"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-purple-100 mb-1"
               >
                 Email address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className="h-5 w-5 text-purple-300"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -109,7 +107,7 @@ export default function Login() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-200"
+                  className="appearance-none block w-full pl-10 px-3 py-3 border border-purple-300/30 bg-white/5 rounded-xl shadow-sm placeholder-purple-300/50 text-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition duration-200"
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -119,14 +117,14 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-purple-100 mb-1"
               >
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className="h-5 w-5 text-purple-300"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -145,7 +143,7 @@ export default function Login() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-200"
+                  className="appearance-none block w-full pl-10 px-3 py-3 border border-purple-300/30 bg-white/5 rounded-xl shadow-sm placeholder-purple-300/50 text-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition duration-200"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -158,7 +156,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition duration-200"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-teal-400 to-purple-500 hover:from-teal-500 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:opacity-50 transition duration-200 shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 <div className="flex items-center">
@@ -191,11 +189,11 @@ export default function Login() {
         </form>
 
         <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-purple-100">
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
+              className="font-medium text-teal-300 hover:text-teal-200 transition duration-200"
             >
               Sign up
             </Link>
