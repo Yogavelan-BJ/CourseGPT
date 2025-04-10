@@ -238,9 +238,11 @@ function GenerateLesson() {
           <div className="mt-4 p-4 bg-purple-900/30 rounded-xl border border-purple-400/30 max-w-2xl mx-auto">
             <p className="text-sm text-purple-200">
               <span className="font-semibold text-white">Note:</span> Due to API
-              constraints, lesson generation may take 30-60 seconds. Generated
-              content is intentionally concise to ensure quality and manage
-              resource limitations.
+              constraints, lesson generation may take 30-60 seconds. If the
+              process takes too long, it may fail due to API Gateway time
+              limits. In such cases, please try again with a more specific
+              topic. Generated content is intentionally concise to ensure
+              quality and manage resource limitations.
             </p>
           </div>
         </div>

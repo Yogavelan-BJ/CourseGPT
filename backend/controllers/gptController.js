@@ -39,7 +39,7 @@ async function generateLesson(req, res) {
     - Include 2 learning outcomes as bullet points
     - Include 2 key terms with their definitions
     - Provide 2 practical examples if applicable, if not give 2 facts about the topic.
-    - Include Necessary subtopics (2) with their content (100-150 words) to teach all the learning objectives.
+    - Include Necessary subtopics (2) with their content (100 words) to teach all the learning objectives.
     
     Return ONLY the JSON object, without any markdown formatting or additional text.`;
 
